@@ -71,6 +71,7 @@ func indexRequest(w http.ResponseWriter, r *http.Request) {
 		now := time.Now()
 		dash := datadog2image.NewDashboard(url).GetScreenshot(waitLoading).AddTimestamp(&now)
 		if dash.Error != nil {
+			log.Println(dash.Error.Error())
 			w.WriteHeader(http.StatusServiceUnavailable)
 			w.Write([]byte(dash.Error.Error()))
 		}
