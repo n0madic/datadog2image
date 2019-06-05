@@ -1,0 +1,42 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: datadog2image
+spec:
+  replicas: 1
+  revisionHistoryLimit: 1
+  strategy:
+    type: RollingUpdate
+  selector:
+    matchLabels:
+      app: datadog2image
+  template:
+    metadata:
+      labels:
+        app: datadog2image
+    spec:
+      containers:
+      - image: n0madic/datadog2image
+        imagePullPolicy: Always
+        name: datadog2image
+        args: ["-http", ":8000"]
+        livenessProbe:
+          tcpSocket:
+            port: 8000
+          initialDelaySeconds: 5
+          periodSeconds: 30
+      automountServiceAccountToken: false
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: datadog2image
+spec:
+  type: LoadBalancer
+  selector:
+    app: datadog2image
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 8000
