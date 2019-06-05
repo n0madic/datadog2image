@@ -17,6 +17,7 @@ import (
 	"golang.org/x/image/font/gofont/goregular"
 	"golang.org/x/image/math/fixed"
 
+	"github.com/chromedp/cdproto/emulation"
 	"github.com/chromedp/chromedp"
 	"github.com/golang/freetype/truetype"
 )
@@ -48,6 +49,7 @@ func (d *Dashboard) GetScreenshot(waitLoading int64) *Dashboard {
 	defer cancel()
 
 	d.Error = chromedp.Run(ctx, chromedp.Tasks{
+		emulation.SetDeviceMetricsOverride(1920, 1080, 1.0, false),
 		chromedp.Navigate(d.URL),
 		chromedp.WaitVisible(sel, chromedp.ByID),
 		chromedp.Sleep(time.Second * time.Duration(waitLoading)),
