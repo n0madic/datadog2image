@@ -9,6 +9,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/NYTimes/gziphandler"
 	"github.com/n0madic/datadog2image"
 )
 
@@ -32,7 +33,24 @@ func main() {
 	flag.Parse()
 
 	if httpListen != "" {
-		http.HandleFunc("/", indexRequest)
+		indexHandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			url := r.URL.Query().Get("url")
+			if url != "" {
+				w.Header().Set("Content-Type", "text/html")
+				now := time.Now()
+				dash := datadog2image.NewDashboard(url).GetScreenshot(waitLoading).AddTimestamp(&now)
+				if dash.Error != nil {
+					log.Println(dash.Error.Error())
+					w.WriteHeader(http.StatusServiceUnavailable)
+					w.Write([]byte(dash.Error.Error()))
+				}
+				w.Write(dash.HTML(refreshTime))
+			} else {
+				w.WriteHeader(http.StatusBadRequest)
+				w.Write([]byte("ERROR: dashboard url required!"))
+			}
+		})
+		http.Handle("/", gziphandler.GzipHandler(indexHandler))
 		log.Println("Starting HTTP server at", httpListen)
 		log.Fatal(http.ListenAndServe(httpListen, nil))
 	} else if sourceURL == "" || outputFile == "" {
@@ -61,23 +79,5 @@ func main() {
 	defer f.Close()
 	if _, err := f.Write(buf); err != nil {
 		log.Fatal(err)
-	}
-}
-
-func indexRequest(w http.ResponseWriter, r *http.Request) {
-	url := r.URL.Query().Get("url")
-	if url != "" {
-		w.Header().Set("Content-Type", "text/html")
-		now := time.Now()
-		dash := datadog2image.NewDashboard(url).GetScreenshot(waitLoading).AddTimestamp(&now)
-		if dash.Error != nil {
-			log.Println(dash.Error.Error())
-			w.WriteHeader(http.StatusServiceUnavailable)
-			w.Write([]byte(dash.Error.Error()))
-		}
-		w.Write(dash.HTML(refreshTime))
-	} else {
-		w.WriteHeader(http.StatusBadRequest)
-		w.Write([]byte("ERROR: dashboard url required!"))
 	}
 }
