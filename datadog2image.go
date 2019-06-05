@@ -90,7 +90,8 @@ func (d *Dashboard) PNG() []byte {
 
 // HTML return index page with embedded screenshot
 func (d *Dashboard) HTML(refresh int) []byte {
-	return []byte(fmt.Sprintf(`<html>
+	return []byte(fmt.Sprintf(`<!DOCTYPE html>
+<html>
 <head>
 	<meta http-equiv="refresh" content="%d">
 	<style>
