@@ -45,7 +45,7 @@ func (d *Dashboard) GetScreenshot(waitLoading int64) *Dashboard {
 	ctx, cancel := chromedp.NewContext(context.Background())
 	defer cancel()
 
-	ctx, cancel = context.WithTimeout(ctx, time.Duration(waitLoading+10)*time.Second)
+	ctx, cancel = context.WithTimeout(ctx, time.Duration(waitLoading+30)*time.Second)
 	defer cancel()
 
 	d.Error = chromedp.Run(ctx, chromedp.Tasks{
