@@ -6,6 +6,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strconv"
 	"strings"
 	"time"
 
@@ -14,19 +15,23 @@ import (
 )
 
 var (
+	height      int64
 	httpListen  string
 	outputFile  string
 	sourceURL   string
 	waitLoading int64
+	width       int64
 )
 
 const refreshTime = 60
 
 func init() {
+	flag.Int64Var(&height, "height", 1200, "Screenshot height")
 	flag.StringVar(&httpListen, "http", "", "TCP address to HTTP listen on")
 	flag.StringVar(&outputFile, "output", "", "Output filename (screenshot.png or index.html)")
 	flag.StringVar(&sourceURL, "url", "", "Public dashboard url")
 	flag.Int64Var(&waitLoading, "wait", 4, "Dashboard load waiting time in seconds")
+	flag.Int64Var(&width, "width", 1920, "Screenshot width")
 }
 
 func main() {
@@ -35,10 +40,20 @@ func main() {
 	if httpListen != "" {
 		indexHandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			url := r.URL.Query().Get("url")
+			if r.URL.Query().Get("width") != "" {
+				if n, err := strconv.ParseInt(r.URL.Query().Get("width"), 10, 64); err == nil {
+					width = n
+				}
+			}
+			if r.URL.Query().Get("height") != "" {
+				if n, err := strconv.ParseInt(r.URL.Query().Get("height"), 10, 64); err == nil {
+					height = n
+				}
+			}
 			if url != "" {
 				w.Header().Set("Content-Type", "text/html")
 				now := time.Now()
-				dash := datadog2image.NewDashboard(url).GetScreenshot(waitLoading).AddTimestamp(&now)
+				dash := datadog2image.NewDashboard(url).GetScreenshot(width, height, waitLoading).AddTimestamp(&now)
 				if dash.Error != nil {
 					log.Println(dash.Error.Error())
 					w.WriteHeader(http.StatusServiceUnavailable)
@@ -60,7 +75,7 @@ func main() {
 
 	var buf []byte
 	now := time.Now()
-	dash := datadog2image.NewDashboard(sourceURL).GetScreenshot(waitLoading).AddTimestamp(&now)
+	dash := datadog2image.NewDashboard(sourceURL).GetScreenshot(width, height, waitLoading).AddTimestamp(&now)
 	if dash.Error != nil {
 		log.Fatal(dash.Error)
 	}

@@ -39,7 +39,7 @@ func NewDashboard(source string) *Dashboard {
 }
 
 // GetScreenshot from Datadog dashboard via headless Chrome
-func (d *Dashboard) GetScreenshot(waitLoading int64) *Dashboard {
+func (d *Dashboard) GetScreenshot(width, height int64, waitLoading int64) *Dashboard {
 	sel := `#sub_board`
 
 	ctx, cancel := chromedp.NewContext(context.Background())
@@ -49,7 +49,7 @@ func (d *Dashboard) GetScreenshot(waitLoading int64) *Dashboard {
 	defer cancel()
 
 	d.Error = chromedp.Run(ctx, chromedp.Tasks{
-		emulation.SetDeviceMetricsOverride(1920, 1080, 1.0, false),
+		emulation.SetDeviceMetricsOverride(width, height, 1.0, false),
 		chromedp.Navigate(d.URL),
 		chromedp.WaitVisible(sel, chromedp.ByID),
 		chromedp.Sleep(time.Second * time.Duration(waitLoading)),
