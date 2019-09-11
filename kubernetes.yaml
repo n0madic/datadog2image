@@ -26,6 +26,16 @@ spec:
             port: 8000
           initialDelaySeconds: 5
           periodSeconds: 30
+        env:
+        - name: TZ
+          value: "Europe/Kiev"
+        resources:
+          requests:
+            memory: "768Mi"
+            cpu: "350m"
+          limits:
+            memory: "4Gi"
+            cpu: "1"
       automountServiceAccountToken: false
 ---
 apiVersion: v1
@@ -33,10 +43,26 @@ kind: Service
 metadata:
   name: datadog2image
 spec:
-  type: LoadBalancer
+  type: ClusterIP
   selector:
     app: datadog2image
   ports:
   - protocol: TCP
     port: 80
     targetPort: 8000
+---
+apiVersion: networking.k8s.io/v1beta1
+kind: Ingress
+metadata:
+  name: datadog2image
+  annotations:
+    kubernetes.io/ingress.class: nginx
+spec:
+  rules:
+  - host: datadog2image.service
+    http:
+      paths:
+      - path: /
+        backend:
+          serviceName: datadog2image
+          servicePort: 80
