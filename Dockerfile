@@ -6,7 +6,7 @@ ADD . .
 
 RUN cd cmd/datadog2image/ && \
     go get -t && \
-    go build
+    go install -ldflags="-s -w"
 
 
 FROM chromedp/headless-shell
@@ -19,6 +19,6 @@ RUN apt-get update -qq && \
 	apt-get autoremove -yqq && \
 	rm -rf /var/lib/apt/lists/*
 
-COPY --from=builder /go/src/github.com/n0madic/datadog2image/cmd/datadog2image/datadog2image /usr/bin/
+COPY --from=builder /go/bin/* /usr/bin/
 
 ENTRYPOINT ["dumb-init", "--", "datadog2image"]
