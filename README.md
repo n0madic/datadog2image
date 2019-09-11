@@ -13,14 +13,18 @@ go get -u github.com/n0madic/datadog2image/cmd/datadog2image
 
 ```
 Usage of datadog2image:
+  -height int
+      Screenshot height (default 1200)
   -http string
-	TCP address to HTTP listen on
+      TCP address to HTTP listen on
   -output string
-	Output filename (screenshot.png or index.html)
+      Output filename (screenshot.png or index.html)
   -url string
-	Public dashboard url
+      Public dashboard url
   -wait int
-	Dashboard load waiting time in seconds (default 4)
+      Dashboard load waiting time in seconds (default 4)
+  -width int
+      Screenshot width (default 1920)
 ```
 
 ## Usage
@@ -56,7 +60,7 @@ import (
 
 func main() {
     now := time.Now()
-    dash := datadog2image.NewDashboard("https://p.datadoghq.com/...").GetScreenshot(4).AddTimestamp(&now)
+    dash := datadog2image.NewDashboard("https://p.datadoghq.com/...").GetScreenshot(1920, 1200, 4).AddTimestamp(&now)
     if dash.Error != nil {
         panic(dash.Error)
     }
