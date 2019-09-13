@@ -94,6 +94,7 @@ func (d *Dashboard) HTML(refresh int) []byte {
 <html>
 <head>
 	<meta http-equiv="refresh" content="%d">
+	<link rel="shortcut icon" href="https://app.datadoghq.com/favicon.ico">
 	<style>
 		* {
 			margin: 0;
