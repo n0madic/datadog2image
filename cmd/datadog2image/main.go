@@ -30,7 +30,7 @@ func init() {
 	flag.StringVar(&httpListen, "http", "", "TCP address to HTTP listen on")
 	flag.StringVar(&outputFile, "output", "", "Output filename (screenshot.png or index.html)")
 	flag.StringVar(&sourceURL, "url", "", "Public dashboard url")
-	flag.Int64Var(&waitLoading, "wait", 4, "Dashboard load waiting time in seconds")
+	flag.Int64Var(&waitLoading, "wait", 5, "Dashboard load waiting time in seconds")
 	flag.Int64Var(&width, "width", 1920, "Screenshot width")
 }
 
