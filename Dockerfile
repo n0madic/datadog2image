@@ -2,14 +2,17 @@ FROM golang AS builder
 
 WORKDIR /go/src/github.com/n0madic/datadog2image
 
+ADD go.* ./
+
+RUN go mod download
+
 ADD . .
 
 RUN cd cmd/datadog2image/ && \
-    go get -t && \
     go install -ldflags="-s -w"
 
 
-FROM chromedp/headless-shell
+FROM chromedp/headless-shell:stable
 
 RUN ln -s /headless-shell/headless-shell /usr/bin/google-chrome
 
